@@ -1,3 +1,6 @@
 # Project exclude paths
 /app/android/
 /app/ios/
+
+*.properties
+src/main/resources/application.properties
