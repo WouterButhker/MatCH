@@ -27,19 +27,16 @@ public class UserLocationController {
     @Autowired
     transient UserRepository userRepository;
 
-    @PreAuthorize("ROLE_ADMIN")
     @GetMapping("/getbyteam")
     public List<UserLocation> getAllByTeam(Integer teamId) {
         return userLocationRepository.findAllByTeam_Id(teamId);
     }
 
-    @PreAuthorize("ROLE_ADMIN")
     @GetMapping("/getlatest")
     public List<UserLocation> getAllLatest() {
         return userLocationRepository.getLatestPerTeam();
     }
 
-    @PreAuthorize("ROLE_ADMIN")
     @GetMapping("/getall")
     public List<UserLocation> getAll() {
         return userLocationRepository.findAll();
