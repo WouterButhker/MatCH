@@ -25,13 +25,7 @@ export default function BottomTabNavigator() {
           tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
         }}
       />
-      <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoNavigator}
-        options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
-        }}
-      />
+
     </BottomTab.Navigator>
   );
 }
@@ -52,7 +46,7 @@ function TabOneNavigator() {
       <TabOneStack.Screen
         name="TabOneScreen"
         component={TabOneScreen}
-        options={{ headerTitle: 'Tab One Title' }}
+        options={{ headerTitle: 'MatCH Rally 2021'}}
       />
     </TabOneStack.Navigator>
   );
