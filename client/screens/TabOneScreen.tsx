@@ -17,17 +17,29 @@ const LoginButton = ({onPress, title}) => (
 );
 
 class App extends React.Component<{ navigation: NavigationScreenProp<NavigationState, NavigationParams> }, { username: string, password: string }> {
+    constructor (props: any) {
+        super(props);
+        this.state = {
+            username: "",
+            password: "",
+        };
+        //console.log(this.state.coords)
+    }
 
     render() {
         return (
             <>
-                <Image source={require('../icons/logo.png')} style={styles.img} />
+                <Image source={require('../icons/logo.png')} style={styles.img}/>
                 <this.UsernameTextBox/>
                 <this.PasswordTextBox/>
                 <this.Login/>
                 <this.CreateProfile/>
             </>
         );
+    }
+
+    componentDidMount() {
+        SecureStore.getItemAsync('token').then(res => this.redirect(res)).catch()
     }
 
 
@@ -73,20 +85,9 @@ class App extends React.Component<{ navigation: NavigationScreenProp<NavigationS
                                 if (token == null) {
                                     token = "";
                                 }
-                                fetch('http://' + Config.URL + ':' + Config.PORT + '/authentication/isAdmin', {
-                                    method: 'GET',
-                                    headers: {
-                                        Authorization: token
-                                    }
-                                }).then(async result => {
-                                    if(result.status == 200) {
-                                        this.props.navigation.navigate('Map')
-                                    }
-                                    else {
-                                        alert("Other screen")
-                                    }
-                                })
                                 await this.save("token", token)
+                                this.redirect(token)
+
                             }
                         })
                         .catch(err => console.log(err))
@@ -97,6 +98,24 @@ class App extends React.Component<{ navigation: NavigationScreenProp<NavigationS
             </View>
         );
     };
+
+    redirect(token: string | null) {
+        if(token == null) {
+            token = ""
+        }
+        fetch('http://' + Config.URL + ':' + Config.PORT + '/authentication/isAdmin', {
+            method: 'GET',
+            headers: {
+                Authorization: token
+            }
+        }).then(async result => {
+            if (result.status == 200) {
+                this.props.navigation.navigate('Map')
+            } else {
+                alert("Other screen")
+            }
+        })
+    }
 
     async save(key: string, value: string) {
         await SecureStore.setItemAsync(key, value);
