@@ -4,8 +4,11 @@ import {Button, StyleSheet} from 'react-native';
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import MapView, {Marker} from 'react-native-maps';
+import Config from "../config.json";
+import * as SecureStore from 'expo-secure-store';
+import {NavigationParams, NavigationScreenProp, NavigationState} from "react-navigation";
 
-export default class MapScreen extends React.Component<{}, { coords: any[], token: string }> {
+export default class MapScreen extends React.Component<{navigation: NavigationScreenProp<NavigationState, NavigationParams>}, { coords: any[], token: string }> {
     constructor (props: any) {
         super(props);
         this.state = {
@@ -15,13 +18,16 @@ export default class MapScreen extends React.Component<{}, { coords: any[], toke
         //console.log(this.state.coords)
     }
     async getPoints()  {
-        await this.getToken()
-        fetch('http://192.168.2.19:8080/userlocation/getlatest', {
+        await this.getValueFor("token")
+        fetch('http://' + Config.URL + ':' + Config.PORT + '/userlocation/getlatest', {
             method: 'GET',
             headers: {
                 Authorization: this.state.token
             }
-        }).then((response) => response.json())
+        }).then((response) => {
+            if(response.status == 403) {this.props.navigation.navigate('Root')}
+            if(response.status == 401) {this.props.navigation.navigate('Root')}
+            else {return response.json()}})
             .then(json => {
                 let res = []
                 // console.log(json)
@@ -39,17 +45,25 @@ export default class MapScreen extends React.Component<{}, { coords: any[], toke
             .catch(err => console.log(err))
     }
 
-    getToken() {
-        return fetch('http://192.168.2.19:8080/authentication/authenticate?username=kasper3&password=12345678',{
-            method: 'POST'})
-            .then(response => {
-                let res = response.headers.get('Authorization')
-                if(res == null) {
-                    res = "";
-                }
-                this.setState({token: res})
-            })
-            .catch(err => {console.log(err)});
+    // getToken() {
+    //     return fetch('http://' + Config.URL + ':' + Config.PORT + '/authentication/authenticate?username=kasper3&password=12345678',{
+    //         method: 'POST'})
+    //         .then(response => {
+    //             let res = response.headers.get('Authorization')
+    //             if(res == null) {
+    //                 res = "";
+    //             }
+    //             this.setState({token: res})
+    //         })
+    //         .catch(err => {console.log(err)});
+    // }
+    async getValueFor(key: string) {
+        let result = await SecureStore.getItemAsync(key);
+        if (result) {
+            this.setState({token: result})
+        } else {
+            alert('No key found');
+        }
     }
 
     componentDidMount() {
@@ -79,7 +93,6 @@ export default class MapScreen extends React.Component<{}, { coords: any[], toke
                     ))}
                 </MapView>
                 <Button title={'refresh'} onPress={() => this.getPoints()}/>
-                <EditScreenInfo path="/screens/MapScreen.tsx" />
             </View>
         );
     }

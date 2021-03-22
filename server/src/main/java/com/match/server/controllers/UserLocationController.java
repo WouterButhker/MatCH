@@ -8,6 +8,7 @@ import com.match.server.repositories.UserLocationRepository;
 import com.match.server.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,16 +27,19 @@ public class UserLocationController {
     @Autowired
     transient UserRepository userRepository;
 
+    @Secured("ROLE_ADMIN")
     @GetMapping("/getbyteam")
     public List<UserLocation> getAllByTeam(Integer teamId) {
         return userLocationRepository.findAllByTeam_Id(teamId);
     }
 
+    @Secured("ROLE_ADMIN")
     @GetMapping("/getlatest")
     public List<UserLocation> getAllLatest() {
         return userLocationRepository.getLatestPerTeam();
     }
 
+    @Secured("ROLE_ADMIN")
     @GetMapping("/getall")
     public List<UserLocation> getAll() {
         return userLocationRepository.findAll();

@@ -9,6 +9,7 @@ import com.match.server.repositories.UserRepository;
 import com.match.server.repositories.UserTimeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,11 +28,13 @@ public class UserTimeController {
     @Autowired
     transient UserRepository userRepository;
 
+    @Secured("ROLE_ADMIN")
     @GetMapping("/getteam")
     public List<UserTime> getTimesPerTeam(@RequestParam("team") Integer teamId) {
         return userTimeRepository.findAllByTeam_id(teamId);
     }
 
+    @Secured("ROLE_ADMIN")
     @GetMapping("/getfinaltime")
     public long getFinalTime(@RequestParam("team") Integer teamId) {
         List<UserTime> times = userTimeRepository.findAllByTeam_id(teamId);

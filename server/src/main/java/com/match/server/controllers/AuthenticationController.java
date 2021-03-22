@@ -15,6 +15,7 @@ import com.match.server.services.UserServiceImplementation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,7 +50,6 @@ public class AuthenticationController {
      * @return UserResponse response object
      */
     @GetMapping
-    @Secured("ROLE_USER")
     public UserResponse get(@AuthenticationPrincipal User user,
                             @RequestParam("username") Optional<String> username) {
         if (username.isEmpty()) {
@@ -59,6 +59,12 @@ public class AuthenticationController {
 
             return new UserResponse(IdUser, user.isAdmin() || user.getUsername() == username.get());
         }
+    }
+
+    @GetMapping("/isAdmin")
+    @Secured("ROLE_ADMIN")
+    public Boolean get(@AuthenticationPrincipal User user) {
+        return user.isAdmin();
     }
 
     /**
