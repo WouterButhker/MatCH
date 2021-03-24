@@ -112,7 +112,7 @@ class App extends React.Component<{ navigation: NavigationScreenProp<NavigationS
             if (result.status == 200) {
                 this.props.navigation.navigate('Map')
             } else {
-                alert("Other screen")
+                this.props.navigation.navigate('Timescreen')
             }
         })
     }

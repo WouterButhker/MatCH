@@ -10,6 +10,7 @@ import LinkingConfiguration from './LinkingConfiguration';
 import MapScreen from "../screens/MapScreen";
 import TabOneScreen from "../screens/TabOneScreen";
 import RegistrationScreen from "../screens/RegistrationScreen";
+import TimeScreen from "../screens/TimeScreen";
 
 // If you are not familiar with React Navigation, we recommend going through the
 // "Fundamentals" guide: https://reactnavigation.org/docs/getting-started
@@ -33,6 +34,7 @@ function RootNavigator() {
       <Stack.Screen name="Root" component={TabOneScreen} />
       <Stack.Screen name="Map" component={MapScreen} />
       <Stack.Screen name="Register" component={RegistrationScreen} />
+      <Stack.Screen name="Timescreen" component={TimeScreen} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
     </Stack.Navigator>
   );

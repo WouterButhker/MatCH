@@ -4,11 +4,11 @@
     "slug": "client",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./icons/car.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./icons/car.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -26,7 +26,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "permissions": ["ACCESS_FINE_LOCATION"]
+      "permissions": ["ACCESS_COARSE_LOCATION","ACCESS_FINE_LOCATION","ACCESS_FINE_LOCATION"]
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
