@@ -52,7 +52,7 @@ public class TeamController {
 
     @PostMapping("/join")
     public void joinTeam(@AuthenticationPrincipal User user,
-                           @RequestParam("teamname") Optional<Integer> teamId) {
+                           @RequestParam("team") Optional<Integer> teamId) {
         if(user.getTeam() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a team");
         }

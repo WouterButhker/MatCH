@@ -39,7 +39,11 @@ class App extends React.Component<{ navigation: NavigationScreenProp<NavigationS
     }
 
     componentDidMount() {
-        SecureStore.getItemAsync('token').then(res => this.redirect(res)).catch()
+        SecureStore.getItemAsync('token').then(res => {
+            if(res != null && res != "") {
+                this.redirect(res)
+            }
+        }).catch()
     }
 
 

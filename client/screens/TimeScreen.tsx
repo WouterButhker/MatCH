@@ -29,14 +29,15 @@ const LoginButton = ({onPress, title}) => (
     </TouchableOpacity>
 );
 
-class MapScreen extends React.Component<{navigation: NavigationScreenProp<NavigationState, NavigationParams>}, {token: string, time: number, interval: any, start: any} > {
+class MapScreen extends React.Component<{navigation: NavigationScreenProp<NavigationState, NavigationParams>}, {token: string, time: number, interval: any, start: any, locObj: any} > {
     constructor (props: any) {
         super(props);
         this.state = {
             token: '',
             time: 0,
             interval: null,
-            start: null
+            start: null,
+            locObj: null
         };
     }
     // @ts-ignore
@@ -53,6 +54,7 @@ class MapScreen extends React.Component<{navigation: NavigationScreenProp<Naviga
                 }
             })
             .then((response) => {if(response.status == 401 || response.status == 403) {
+                response.json().then(js => console.log(js))
                 this.props.navigation.navigate('Root')
             }})
             .catch(err => console.log(err))
@@ -63,6 +65,7 @@ class MapScreen extends React.Component<{navigation: NavigationScreenProp<Naviga
             <View style={{ flex: 1 }}>
                 <LoginButton onPress={async () => {
                     // this.setState({interval: this.startTime()})
+                    await this.getValueFor('token')
                     await this.startTracking()
                 }} title="Start"/>
                 <LoginButton onPress={() => {
@@ -90,43 +93,61 @@ class MapScreen extends React.Component<{navigation: NavigationScreenProp<Naviga
     }
 
     async startTracking() {
-        let { status } = await Permissions.askAsync(Permissions.LOCATION);;
-        if (status !== 'granted') {
+        let { permissions } = await Permissions.askAsync(Permissions.LOCATION);
+        if (permissions.location.scope == 'none') {
             console.log('Permission to access location was denied');
             return;
         }
         await this.getValueFor("token")
-        Location.startLocationUpdatesAsync("locTrack",{
-            accuracy: LocationAccuracy.High,
-            timeInterval: 10,
-            distanceInterval: 10,
-            foregroundService:{
-                notificationBody: "Your timer is running!",
-                notificationTitle: "MatchApp",
-                notificationColor: ' #ff0000'
-            }
-        })
-    //     , location => {
-    //         fetch('http://' + Config.URL + ':' + Config.PORT +
-    //             '/userlocation/add?lat=' + location.coords.latitude +
-    //             '&long=' + location.coords.longitude +
-    //             '&speed=' + location.coords.speed +
-    //             '&dir=' + location.coords.heading
-    //             , {
-    //                 method: 'POST',
-    //                 headers: {
-    //                     Authorization: this.state.token
-    //                 }
-    //             })
-    //             .then((response) => {if(response.status == 401 || response.status == 403) {
-    //                 this.props.navigation.navigate('Root')
-    //             }})
-    //             .catch(err => console.log(err))
-    //     })
+        if(permissions.location.scope == "whenInUse") {
+            let obj = Location.watchPositionAsync({
+                    accuracy: LocationAccuracy.High,
+                    timeInterval: 10,
+                    distanceInterval: 10
+                },
+                loc => {
+                    fetch('http://' + Config.URL + ':' + Config.PORT +
+                        '/userlocation/add?lat=' + loc.coords.latitude +
+                        '&long=' + loc.coords.longitude +
+                        '&speed=' + '0' +
+                        '&dir=' + '0'
+                        , {
+                            method: 'POST',
+                            headers: {
+                                Authorization: this.state.token
+                            }
+                        })
+                        .then((response) => {if(response.status == 401 || response.status == 403) {
+                            this.props.navigation.navigate('Root')
+                        }})
+                        .catch(err => console.log(err))
+                }
+            )
+            await this.setState({locObj: obj})
+        }
+        else if(permissions.location.scope == "always"){
+            Location.startLocationUpdatesAsync("locTrack", {
+                accuracy: LocationAccuracy.High,
+                timeInterval: 10,
+                distanceInterval: 10,
+                foregroundService: {
+                    notificationBody: "Your timer is running!",
+                    notificationTitle: "MatchApp",
+                    notificationColor: ' #ff0000'
+                }
+            })
+        }
     }
 
     async stopTracking() {
-        await Location.stopLocationUpdatesAsync("locTrack")
+        let { permissions } = await Permissions.getAsync(Permissions.LOCATION);
+        if(permissions.location.scope == "always") {
+            await Location.stopLocationUpdatesAsync("locTrack")
+        }
+        else {
+            let obj = await this.state.locObj
+            obj.remove()
+        }
     }
 
     startTime() {

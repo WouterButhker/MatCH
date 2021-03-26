@@ -164,16 +164,28 @@ class RegistrationScreen extends React.Component<{ navigation: NavigationScreenP
                                     token = "";
                                 }
                                 await this.save("token", token)
-                                console.log(result.headers.get('authorization'))
-                                this.props.navigation.navigate('Map')
+                                fetch('http://' + Config.URL + ':' + Config.PORT + '/teams/join?team=' + this.state.team,{
+                                    method: 'POST',
+                                    headers: {
+                                        Authorization: token
+                                    }
+                                }).then(async result => {
+                                    if(result.status == 200) {
+                                        this.props.navigation.navigate('Timescreen')
+                                    }
+                                    else {
+                                        console.log(await result.json())
+                                        alert("Something went wrong while joining the team")
+                                    }
+                                }).catch(err => console.log(err))
+
                             }
-                        })
-                        .catch(err => console.log(err))
+                        }).catch(err => console.log(err))
         }}
         title="Create profile"/>
             </View>
     );
-    };
+    }
 
     async save(key: string, value: string) {
         await SecureStore.setItemAsync(key, value);
@@ -182,7 +194,7 @@ class RegistrationScreen extends React.Component<{ navigation: NavigationScreenP
     TeamPicker = () => {
         return (
             <DropDownPicker items={this.state.teams}
-                            onChangeItem={item => {console.log(item); this.setState({team: item.value})}}
+                            onChangeItem={item => {this.setState({team: item.value})}}
                             containerStyle={styles.pickerContainer}
                             placeholder="Select a Team"
             />
