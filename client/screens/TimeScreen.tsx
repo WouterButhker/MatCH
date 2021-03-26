@@ -29,15 +29,17 @@ const LoginButton = ({onPress, title}) => (
     </TouchableOpacity>
 );
 
-class MapScreen extends React.Component<{navigation: NavigationScreenProp<NavigationState, NavigationParams>}, {token: string, time: number, interval: any, start: any, locObj: any} > {
+class MapScreen extends React.Component<{navigation: NavigationScreenProp<NavigationState, NavigationParams>}, {token: string, time: number, interval: any, start: number, locObj: any, pauseTime: number, pauseAmount: number} > {
     constructor (props: any) {
         super(props);
         this.state = {
             token: '',
             time: 0,
             interval: null,
-            start: null,
-            locObj: null
+            start: 0,
+            locObj: null,
+            pauseTime: 0,
+            pauseAmount: 0
         };
     }
     // @ts-ignore
@@ -61,19 +63,30 @@ class MapScreen extends React.Component<{navigation: NavigationScreenProp<Naviga
     }
 
     render () {
+        let name = "pause"
+        if(this.state.pauseTime != 0) {
+            name = "resume"
+        }
         return (
             <View style={{ flex: 1 }}>
                 <LoginButton onPress={async () => {
-                    // this.setState({interval: this.startTime()})
+                    this.setState({interval: this.startTime()})
                     await this.getValueFor('token')
                     await this.startTracking()
                 }} title="Start"/>
+                <LoginButton onPress={async () => {
+                    if(name == "pause") {
+                        await this.pausetime()
+                    } else {
+                        await this.resumeTime()
+                    }
+                }} title={name}/>
                 <LoginButton onPress={() => {
-                    // BackgroundTimer.clearInterval(this.state.interval);
                     this.stopTracking()
+                    this.stopTime()
                 }} title="Stop"/>
                 <Text style={styles.appButtonText}>{
-                    Math.floor(this.state.time-this.state.start)/1000
+                    this.getTimeString(Math.floor((this.state.time-this.state.start-this.state.pauseAmount)/1000))
                 }</Text>
             </View>
         );
@@ -139,6 +152,55 @@ class MapScreen extends React.Component<{navigation: NavigationScreenProp<Naviga
         }
     }
 
+    async pausetime() {
+        if(this.state.start == 0) {
+            alert("You have not started yet")
+            return
+        }
+        if(this.state.pauseTime != 0) {
+            alert("You have already paused once")
+            return
+        }
+        this.setState({pauseTime: Date.now()})
+        clearInterval(await this.state.interval)
+        await this.getValueFor('token')
+        fetch('http://' + Config.URL + ':' + Config.PORT + '/time/pause'
+            , {
+                method: 'POST',
+                headers: {
+                    Authorization: this.state.token
+                }
+            })
+    }
+
+    async resumeTime() {
+        this.setState({pauseAmount: Date.now() - this.state.pauseTime})
+        let interval = setInterval(() => {
+            this.setState({time: Date.now()})
+        }, 1000)
+        this.setState({interval: interval})
+        await this.getValueFor('token')
+        fetch('http://' + Config.URL + ':' + Config.PORT + '/time/resume'
+            , {
+                method: 'POST',
+                headers: {
+                    Authorization: this.state.token
+                }
+            })
+    }
+
+    async stopTime() {
+        clearInterval(await this.state.interval)
+        await this.getValueFor('token')
+        fetch('http://' + Config.URL + ':' + Config.PORT + '/time/finish'
+            , {
+                method: 'POST',
+                headers: {
+                    Authorization: this.state.token
+                }
+            })
+    }
+
     async stopTracking() {
         let { permissions } = await Permissions.getAsync(Permissions.LOCATION);
         if(permissions.location.scope == "always") {
@@ -150,8 +212,17 @@ class MapScreen extends React.Component<{navigation: NavigationScreenProp<Naviga
         }
     }
 
-    startTime() {
+    async startTime() {
+        await this.getValueFor('token')
         this.setState({start: Date.now()})
+        fetch('http://' + Config.URL + ':' + Config.PORT + '/time/start'
+            , {
+                method: 'POST',
+                headers: {
+                    Authorization: this.state.token
+                }
+            })
+
         return setInterval(() => {
             this.setState({time: Date.now()})
         }, 1000)
