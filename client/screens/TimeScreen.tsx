@@ -23,8 +23,8 @@ TaskManager.defineTask("locTrack", ({ data: { locations }, error }) => {
 });
 
 // @ts-ignore
-const LoginButton = ({onPress, title}) => (
-    <TouchableOpacity onPress={onPress} style={styles.appButtonContainer}>
+const LoginButton = ({onPress, title, disabled}) => (
+    <TouchableOpacity onPress={onPress} style={styles.appButtonContainer} disabled={disabled}>
         <Text style={styles.appButtonText}>{title}</Text>
     </TouchableOpacity>
 );
@@ -73,21 +73,21 @@ class MapScreen extends React.Component<{navigation: NavigationScreenProp<Naviga
                     this.setState({interval: this.startTime()})
                     await this.getValueFor('token')
                     await this.startTracking()
-                }} title="Start"/>
+                }} title="Start" disabled={false}/>
                 <LoginButton onPress={async () => {
                     if(name == "pause") {
                         await this.pausetime()
                     } else {
                         await this.resumeTime()
                     }
-                }} title={name}/>
+                }} title={name} disabled={!this.state.start} />
                 <LoginButton onPress={() => {
                     this.stopTracking()
                     this.stopTime()
-                }} title="Stop"/>
+                }} title="Stop" disabled={!this.state.start}/>
                 <Text style={styles.appButtonText}>{
                     this.getTimeString(Math.floor((this.state.time-this.state.start-this.state.pauseAmount)/1000))
-                }</Text>
+                } </Text>
             </View>
         );
     }
@@ -102,7 +102,9 @@ class MapScreen extends React.Component<{navigation: NavigationScreenProp<Naviga
     }
 
     async componentDidMount() {
+        await this.getValueFor('token')
         locationService.subscribe(this.onLocationUpdate)
+        await this.updateTme()
     }
 
     async startTracking() {
@@ -226,6 +228,38 @@ class MapScreen extends React.Component<{navigation: NavigationScreenProp<Naviga
         return setInterval(() => {
             this.setState({time: Date.now()})
         }, 1000)
+    }
+
+    async updateTme() {
+        fetch('http://' + Config.URL + ':' + Config.PORT + '/time/get', {
+                method: 'GET',
+                headers: {
+                    Authorization: this.state.token
+                }
+        }).then((response) => {
+            if(response.status == 403) {this.props.navigation.navigate('Root')}
+            if(response.status == 401) {this.props.navigation.navigate('Root')}
+            else {return response.json()}})
+            .then(json => {
+                console.log(json)
+                for(let j in json) {
+                    switch(json[j].type){
+                        case "START":
+                            this.setState({start: Date.parse(json[j].timestamp)})
+                            break
+                        case "PAUSE":
+                            this.setState({pauseTime: Date.parse(json[j].timestamp)})
+                            break
+                        case "RESUME":
+                            this.setState({pauseAmount: this.state.pauseTime - Date.parse(json[j].timestamp)})
+                            break
+                        case "FINISH":
+                            this.setState({time: Date.parse(json[j].timestamp)-this.state.start-this.state.pauseAmount})
+                            break
+                    }
+                }
+            })
+            .catch(err => console.log(err))
     }
 
     getTimeString(sec: number) {

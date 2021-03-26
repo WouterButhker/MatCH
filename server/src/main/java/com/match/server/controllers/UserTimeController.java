@@ -34,6 +34,12 @@ public class UserTimeController {
         return userTimeRepository.findAllByTeam_id(teamId);
     }
 
+    @GetMapping("/get")
+    public List<UserTime> getTimes(@AuthenticationPrincipal User user) {
+        User newUser = userRepository.findById(user.getUsername()).get();
+        return userTimeRepository.findAllByTeam_id(newUser.getTeam().getId());
+    }
+
     @Secured("ROLE_ADMIN")
     @GetMapping("/getfinaltime")
     public long getFinalTime(@RequestParam("team") Integer teamId) {
