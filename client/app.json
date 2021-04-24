@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "client",
+    "name": "MatCH Rally",
     "slug": "client",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./icons/car.png",
+    "icon": "./icons/logo_app.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./icons/car.png",
+      "image": "./icons/logo_app.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -22,11 +22,21 @@
       "supportsTablet": true
     },
     "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDoMEFSDPAaj8EfBObW1rm-R7UQxg7y5Y8"
+        }
+      },
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./icons/logo_app.png",
         "backgroundColor": "#FFFFFF"
       },
-      "permissions": ["ACCESS_COARSE_LOCATION","ACCESS_FINE_LOCATION","ACCESS_FINE_LOCATION"]
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION"
+      ],
+      "package": "com.kasperv00.client"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"

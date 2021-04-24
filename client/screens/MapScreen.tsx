@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, StyleSheet} from 'react-native';
+import {Button, Image, StyleSheet} from 'react-native';
 
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
@@ -7,6 +7,7 @@ import MapView, {Marker} from 'react-native-maps';
 import Config from "../config.json";
 import * as SecureStore from 'expo-secure-store';
 import {NavigationParams, NavigationScreenProp, NavigationState} from "react-navigation";
+let car = require('../icons/car.png')
 
 export default class MapScreen extends React.Component<{navigation: NavigationScreenProp<NavigationState, NavigationParams>}, { coords: any[], token: string }> {
     constructor (props: any) {
@@ -88,8 +89,9 @@ export default class MapScreen extends React.Component<{navigation: NavigationSc
                             coordinate={marker.coordinates}
                             title={marker.title}
                             key={index}
-                            image={require('../icons/car.png')}
-                        />
+                            // image={car}
+                        >
+                        </Marker>
                     ))}
                 </MapView>
                 <Button title={'refresh'} onPress={() => this.getPoints()}/>
