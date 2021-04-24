@@ -69,25 +69,25 @@ class MapScreen extends React.Component<{navigation: NavigationScreenProp<Naviga
         }
         return (
             <View style={{ flex: 1 }}>
+                <View style={styles.separator}></View>
+                <View style={styles.separator}></View>
                 <LoginButton onPress={async () => {
                     this.setState({interval: this.startTime()})
                     await this.getValueFor('token')
                     await this.startTracking()
                 }} title="Start" disabled={false}/>
-                <LoginButton onPress={async () => {
-                    if(name == "pause") {
-                        await this.pausetime()
-                    } else {
-                        await this.resumeTime()
-                    }
-                }} title={name} disabled={!this.state.start} />
                 <LoginButton onPress={() => {
                     this.stopTracking()
                     this.stopTime()
                 }} title="Stop" disabled={!this.state.start}/>
-                <Text style={styles.appButtonText}>{
+                <View style={styles.separator}></View>
+                <Text style={styles.timeText}>{
                     this.getTimeString(Math.floor((this.state.time-this.state.start-this.state.pauseAmount)/1000))
                 } </Text>
+                <Text style={styles.warningText}> When the start button is pressed your location will be tracked even when the app is closed.
+                    Your location will only be accessible by the MatCH Committee members to more easily help you during the Rally in case something goes wrong.
+                    When the stop button is pressed, the app will not track your location anymore.
+                </Text>
             </View>
         );
     }
@@ -316,6 +316,24 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         alignSelf: "center",
         textTransform: "uppercase"
+    },
+    timeText: {
+        justifyContent: 'center',
+        fontSize: 30,
+        color: "#fff",
+        fontWeight: "bold",
+        alignSelf: "center",
+        textTransform: "uppercase"
+    },
+    warningText: {
+        justifyContent: 'center',
+        fontSize: 14,
+        color: "#fff",
+        // fontWeight: "bold",
+        alignSelf: "center",
+        position: 'absolute',
+        marginHorizontal: 20,
+        bottom: 50
     },
     textContainer: {
         justifyContent: 'center',
