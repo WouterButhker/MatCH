@@ -2,9 +2,9 @@
   "expo": {
     "name": "MatCH Rally",
     "slug": "client",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./icons/logo_app.png",
+    "icon": "./icons/logoapp.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
