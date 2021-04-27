@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {View, Button, StyleSheet, TouchableOpacity, Text, TextInput, Image} from "react-native";
+import {View, Button, StyleSheet, TouchableOpacity, Text, TextInput, Image, Linking} from "react-native";
 import Config from '../config.json'
 import * as SecureStore from 'expo-secure-store';
 import {
@@ -34,6 +34,10 @@ class App extends React.Component<{ navigation: NavigationScreenProp<NavigationS
                 <this.PasswordTextBox/>
                 <this.Login/>
                 <this.CreateProfile/>
+                <Text style={styles.policy}
+                      onPress={() => Linking.openURL('http://samballen.nl:8081/policy')}>
+                    Privacy policy
+                </Text>
             </>
         );
     }
@@ -188,6 +192,11 @@ const styles = StyleSheet.create({
         width: 300,
         margin: 10,
         marginTop: 30
+    },
+    policy: {
+        color: 'blue',
+        justifyContent: 'center',
+        alignSelf: 'center'
     }
 });
 

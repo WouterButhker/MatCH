@@ -19,6 +19,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/authentication/register").permitAll()
                 .antMatchers("/authentication/authenticate").permitAll()
                 .antMatchers("/teams/get").permitAll()
+                .antMatchers("/policy").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(jwtAuthenticationFilter())

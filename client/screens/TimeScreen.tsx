@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {Linking, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import * as Location from 'expo-location';
 import {LocationAccuracy} from 'expo-location';
 import {View} from '../components/Themed';
@@ -68,7 +68,7 @@ class MapScreen extends React.Component<{navigation: NavigationScreenProp<Naviga
             name = "resume"
         }
         return (
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, backgroundColor: '#000' }}>
                 <View style={styles.separator}></View>
                 <View style={styles.separator}></View>
                 <LoginButton onPress={async () => {
@@ -292,6 +292,7 @@ const styles = StyleSheet.create({
         marginVertical: 20,
         height: 1,
         width: '80%',
+        backgroundColor: '#000'
     },
     screenContainer: {
         justifyContent: 'center',
